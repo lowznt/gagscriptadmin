@@ -25,7 +25,7 @@ layout.FillDirection = Enum.FillDirection.Vertical
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
 
--- Create Button
+-- Hoverable Button Creator
 local function createButton(name)
 	local btn = Instance.new("TextButton", mainFrame)
 	btn.Size = UDim2.new(0.8, 0, 0, 40)
@@ -34,13 +34,22 @@ local function createButton(name)
 	btn.TextSize = 24
 	btn.TextColor3 = Color3.new(1, 1, 1)
 	btn.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
-	btn.AutoButtonColor = true
+	btn.AutoButtonColor = false
 	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+
+	-- Hover effect
+	btn.MouseEnter:Connect(function()
+		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(90, 90, 90)}):Play()
+	end)
+	btn.MouseLeave:Connect(function()
+		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(65, 65, 65)}):Play()
+	end)
+
 	return btn
 end
 
--- Fullscreen Loading with Progress Bar
-local function showLoadingScreen(message)
+-- Loading Screen with Progress Bar (3s)
+local function showLoadingScreen(message, callback)
 	local screen = Instance.new("ScreenGui", playerGui)
 	screen.Name = "LoadingScreen"
 	screen.IgnoreGuiInset = true
@@ -82,12 +91,12 @@ local function showLoadingScreen(message)
 	progressBar.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 	Instance.new("UICorner", progressBar).CornerRadius = UDim.new(1, 0)
 
-	-- Loading Animation
+	-- Animate Progress
 	task.spawn(function()
 		for i = 1, 100 do
 			percent.Text = i .. "%"
-			progressBar:TweenSize(UDim2.new(i/100, 0, 1, 0), "Out", "Sine", 0.05, true)
-			wait(0.05)
+			progressBar:TweenSize(UDim2.new(i / 100, 0, 1, 0), "Out", "Sine", 0.03, true)
+			wait(3 / 100) -- total 3 seconds
 		end
 
 		-- Fade out
@@ -99,42 +108,70 @@ local function showLoadingScreen(message)
 
 		wait(1.1)
 		screen:Destroy()
+		callback()
 	end)
 end
 
--- Load Script (Dummy for illustration)
+-- Animated "Please Wait Loading Script..." UI
+local function showLoadingScriptUI()
+	local screen = Instance.new("ScreenGui", playerGui)
+	screen.Name = "ScriptWaitUI"
+	screen.ResetOnSpawn = false
+
+	local label = Instance.new("TextLabel", screen)
+	label.Size = UDim2.new(0, 350, 0, 50)
+	label.Position = UDim2.new(0.5, -175, 0.5, -25)
+	label.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	label.Text = "Please Wait Loading Script"
+	label.Font = Enum.Font.Cartoon
+	label.TextSize = 28
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.BackgroundTransparency = 0.1
+	Instance.new("UICorner", label).CornerRadius = UDim.new(0, 10)
+
+	local running = true
+	task.spawn(function()
+		while running do
+			for i = 0, 3 do
+				if not running then break end
+				label.Text = "Please Wait Loading Script" .. string.rep(".", i)
+				wait(0.5)
+			end
+		end
+	end)
+
+	delay(10, function()
+		running = false
+		screen:Destroy()
+	end)
+end
+
+-- Load External Script
 local function runScript()
 	pcall(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua"))()
 	end)
 end
 
--- Button Click Handler
+-- Button Click Logic
 local function onButtonClick(btn, msg)
-	-- Animate and hide buttons
+	-- Disable and hide UI
+	mainGui.Enabled = false
 	for _, child in ipairs(mainFrame:GetChildren()) do
 		if child:IsA("TextButton") then
 			child.Visible = false
 		end
 	end
 
-	-- Animate frame away
-	TweenService:Create(mainFrame, TweenInfo.new(0.4), {
-		Size = UDim2.new(0, 0, 0, 0),
-		Position = UDim2.new(0.5, 0, 0.5, 0)
-	}):Play()
-
-	wait(0.3)
-	mainGui.Enabled = false
-
-	-- Immediately run script
-	runScript()
-
-	-- Show loading screen
-	showLoadingScreen(msg)
+	-- Show loading screen instantly
+	showLoadingScreen(msg, function()
+		-- After loading: execute script & show wait UI
+		runScript()
+		showLoadingScriptUI()
+	end)
 end
 
--- Buttons
+-- Create Buttons
 local adminBtn = createButton("Admin Commands")
 adminBtn.MouseButton1Click:Connect(function()
 	onButtonClick(adminBtn, "Finding a Low Server In order Admin Commands Work.")
