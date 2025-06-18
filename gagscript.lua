@@ -1,6 +1,7 @@
 -- Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
@@ -23,7 +24,7 @@ layout.FillDirection = Enum.FillDirection.Vertical
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
 
--- "Please Wait" small label (hidden by default)
+-- "Please Wait" small popup
 local waitGui = Instance.new("TextLabel")
 waitGui.Parent = mainGui
 waitGui.Size = UDim2.new(0, 200, 0, 50)
@@ -39,27 +40,73 @@ Instance.new("UICorner", waitGui).CornerRadius = UDim.new(0, 10)
 
 -- FUNCTION: Create Fullscreen Loading Screen
 local function createFullscreenLoading(message)
-	local screen = Instance.new("ScreenGui", playerGui)
+	local screen = Instance.new("ScreenGui")
 	screen.Name = "FullLoadingScreen"
 	screen.ResetOnSpawn = false
+	screen.IgnoreGuiInset = true
+	screen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screen.Parent = playerGui
 
 	local frame = Instance.new("Frame", screen)
+	frame.Name = "Background"
 	frame.Size = UDim2.new(1, 0, 1, 0)
+	frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	frame.AnchorPoint = Vector2.new(0.5, 0.5)
 	frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	frame.ZIndex = 10
 
 	local label = Instance.new("TextLabel", frame)
 	label.Size = UDim2.new(1, 0, 1, 0)
+	label.Position = UDim2.new(0.5, 0, 0.5, 0)
+	label.AnchorPoint = Vector2.new(0.5, 0.5)
 	label.Text = message
 	label.Font = Enum.Font.Cartoon
 	label.TextSize = 40
 	label.TextColor3 = Color3.fromRGB(255, 255, 255)
 	label.BackgroundTransparency = 1
 	label.TextTransparency = 0
+	label.TextWrapped = true
+	label.ZIndex = 11
 
 	return screen, frame, label
 end
 
--- FUNCTION: Create Button
+-- FUNCTION: Create "Loading Script..." small UI with animated text
+local function createScriptLoadingUI()
+	local screen = Instance.new("ScreenGui", playerGui)
+	screen.Name = "ScriptLoadingUI"
+	screen.ResetOnSpawn = false
+
+	local label = Instance.new("TextLabel", screen)
+	label.Size = UDim2.new(0, 350, 0, 50)
+	label.Position = UDim2.new(0.5, -175, 0.5, -25)
+	label.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	label.Text = "Loading Script, Please wait"
+	label.Font = Enum.Font.Cartoon
+	label.TextSize = 28
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.BackgroundTransparency = 0.1
+	Instance.new("UICorner", label).CornerRadius = UDim.new(0, 10)
+
+	-- Animated dot loop
+	local dots = ""
+	local running = true
+	task.spawn(function()
+		while running do
+			for i = 0, 3 do
+				if not running then break end
+				dots = string.rep(".", i)
+				label.Text = "Loading Script, Please wait" .. dots
+				wait(0.5)
+			end
+		end
+	end)
+
+	-- Return control to stop animation later
+	return screen, function() running = false end
+end
+
+-- FUNCTION: Create Buttons
 local function createButton(name)
 	local btn = Instance.new("TextButton", mainFrame)
 	btn.Size = UDim2.new(0.8, 0, 0, 40)
@@ -74,11 +121,18 @@ local function createButton(name)
 end
 
 -- FUNCTION: Handle Button Logic
-local function onButtonClick(button, loadingMessage)
-	-- Shrink animation
-	local shrinkTween = TweenService:Create(button, TweenInfo.new(0.3), {
-		Size = UDim2.new(0.8, 0, 0, 0),
-		TextTransparency = 1
+local function onButtonClick(clickedButton, loadingMessage)
+	-- Disable other buttons and shrink UI
+	for _, child in pairs(mainFrame:GetChildren()) do
+		if child:IsA("TextButton") and child ~= clickedButton then
+			child.Visible = false
+		end
+	end
+
+	-- Shrink entire frame
+	local shrinkTween = TweenService:Create(mainFrame, TweenInfo.new(0.4), {
+		Size = UDim2.new(0, 0, 0, 0),
+		Position = UDim2.new(0.5, 0, 0.5, 0)
 	})
 	shrinkTween:Play()
 	shrinkTween.Completed:Wait()
@@ -86,41 +140,33 @@ local function onButtonClick(button, loadingMessage)
 	waitGui.Visible = true
 	wait(2)
 
-	-- Hide main GUI
+	-- Hide all
 	mainGui.Enabled = false
 	waitGui.Visible = false
 
-	-- Show fullscreen loading
+	-- Show fullscreen loading screen
 	local screen, frame, label = createFullscreenLoading(loadingMessage)
-	wait(10) -- Hold loading for 10 seconds
+	wait(10) -- Hold fullscreen for 10s
 
-	-- Fade out loading screen
+	-- Fade out
 	TweenService:Create(frame, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
 	TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
 	wait(1.1)
 	screen:Destroy()
 
+	-- Show "Loading Script" screen with animation
+	local loadingUI, stopAnim = createScriptLoadingUI()
+	wait(4)
+	stopAnim()
+	loadingUI:Destroy()
+
 	-- Load external script
 	pcall(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua"))()
 	end)
-
-	-- Placeholder final UI
-	local finalGui = Instance.new("ScreenGui", playerGui)
-	finalGui.Name = "FinalUI"
-
-	local finalMsg = Instance.new("TextLabel", finalGui)
-	finalMsg.Size = UDim2.new(0.5, 0, 0.1, 0)
-	finalMsg.Position = UDim2.new(0.5, -150, 0.5, -25)
-	finalMsg.Text = "Module Loaded!"
-	finalMsg.Font = Enum.Font.Cartoon
-	finalMsg.TextSize = 36
-	finalMsg.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-	finalMsg.TextColor3 = Color3.new(1, 1, 1)
-	Instance.new("UICorner", finalMsg).CornerRadius = UDim.new(0, 10)
 end
 
--- Create and bind buttons
+-- Buttons
 local adminButton = createButton("Admin Abuse")
 adminButton.MouseButton1Click:Connect(function()
 	onButtonClick(adminButton, "Bypassing Command Panel Please Wait.")
