@@ -14,6 +14,31 @@ mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark gray background
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
+-- Function to create RGB lighting effect
+local function createRGBLighting(frame)
+    local tweenService = game:GetService("TweenService")
+    local rgbTween = Instance.new("TweenInfo", frame)
+    rgbTween.Time = 2
+    rgbTween.RepeatCount = -1
+    rgbTween.EasingStyle = Enum.EasingStyle.Linear
+    rgbTween.EasingDirection = Enum.EasingDirection.InOut
+
+    while true do
+        for i = 0, 255, 5 do
+            frame.BackgroundColor3 = Color3.fromRGB(i, 0, 255 - i) -- RGB transition from blue to red
+            wait(0.05)
+        end
+        for i = 0, 255, 5 do
+            frame.BackgroundColor3 = Color3.fromRGB(255 - i, i, 0) -- RGB transition from red to green
+            wait(0.05)
+        end
+        for i = 0, 255, 5 do
+            frame.BackgroundColor3 = Color3.fromRGB(0, 255 - i, i) -- RGB transition from green to blue
+            wait(0.05)
+        end
+    end
+end
+
 -- Create the buttons
 local button1 = Instance.new("TextButton")
 button1.Size = UDim2.new(0.8, 0, 0.2, 0)
@@ -32,6 +57,10 @@ button2.TextColor3 = Color3.fromRGB(255, 255, 255)
 button2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 button2.BorderSizePixel = 0
 button2.Parent = mainFrame
+
+-- Apply RGB lighting effect to buttons
+createRGBLighting(button1)
+createRGBLighting(button2)
 
 -- Animation for buttons on hover
 local function animateButton(button)
@@ -105,9 +134,10 @@ local function createLoadingScreen2()
     loadingCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     loadingCircle.Parent = loadingScreen2
 
-    -- Animate the loading circle
+    -- Animate the loading circle with RGB effect
     for i = 1, 40 do
         loadingCircle.Rotation = loadingCircle.Rotation + 9 -- Rotate 9 degrees each frame
+        loadingCircle.BackgroundColor3 = Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255)) -- Random RGB color
         wait(1) -- Wait for 1 second for each frame of the animation
     end
 
