@@ -16,13 +16,6 @@ mainFrame.Parent = screenGui
 
 -- Function to create RGB lighting effect
 local function createRGBLighting(frame)
-    local tweenService = game:GetService("TweenService")
-    local rgbTween = Instance.new("TweenInfo", frame)
-    rgbTween.Time = 2
-    rgbTween.RepeatCount = -1
-    rgbTween.EasingStyle = Enum.EasingStyle.Linear
-    rgbTween.EasingDirection = Enum.EasingDirection.InOut
-
     while true do
         for i = 0, 255, 5 do
             frame.BackgroundColor3 = Color3.fromRGB(i, 0, 255 - i) -- RGB transition from blue to red
@@ -47,6 +40,7 @@ button1.Text = "Dupe Now!"
 button1.TextColor3 = Color3.fromRGB(255, 255, 255)
 button1.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 button1.BorderSizePixel = 0
+button1.Font = Enum.Font.SourceSans -- Default font
 button1.Parent = mainFrame
 
 local button2 = Instance.new("TextButton")
@@ -56,6 +50,7 @@ button2.Text = "Admin Commands"
 button2.TextColor3 = Color3.fromRGB(255, 255, 255)
 button2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 button2.BorderSizePixel = 0
+button2.Font = Enum.Font.SourceSans -- Default font
 button2.Parent = mainFrame
 
 -- Apply RGB lighting effect to buttons
@@ -76,87 +71,45 @@ end
 animateButton(button1)
 animateButton(button2)
 
--- Function to create the first loading screen
-local function createLoadingScreen1()
-    local loadingScreen1 = Instance.new("Frame")
-    loadingScreen1.Size = UDim2.new(1, 0, 1, 0) -- Fullscreen
-    loadingScreen1.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
-    loadingScreen1.Parent = screenGui
+-- Function to create a loading screen
+local function createLoadingScreen(text)
+    local loadingScreen = Instance.new("Frame")
+    loadingScreen.Size = UDim2.new(1, 0, 1, 0) -- Fullscreen
+    loadingScreen.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
+    loadingScreen.Parent = screenGui
 
     -- Create a loading label
-    local loadingLabel1 = Instance.new("TextLabel")
-    loadingLabel1.Size = UDim2.new(1, 0, 0.1, 0)
-    loadingLabel1.Position = UDim2.new(0, 0, 0.45, 0)
-    loadingLabel1.Text = "Finding Low Server Please Wait."
-    loadingLabel1.TextColor3 = Color3.fromRGB(255, 255, 255)
-    loadingLabel1.TextScaled = true
-    loadingLabel1.BackgroundTransparency = 1
-    loadingLabel1.Parent = loadingScreen1
+    local loadingLabel = Instance.new("TextLabel")
+    loadingLabel.Size = UDim2.new(1, 0, 0.1, 0)
+    loadingLabel.Position = UDim2.new(0, 0, 0.45, 0)
+    loadingLabel.Text = text
+    loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    loadingLabel.TextScaled = true
+    loadingLabel.BackgroundTransparency = 1
+    loadingLabel.Font = Enum.Font.SourceSans -- Default font
+    loadingLabel.Parent = loadingScreen
 
-    -- Create a magnifying glass animation
-    local magnifyingGlass = Instance.new("ImageLabel")
-    magnifyingGlass.Size = UDim2.new(0.1, 0, 0.1, 0)
-    magnifyingGlass.Position = UDim2.new(0.5, -50, 0.5, -50)
-    magnifyingGlass.Image = "rbxassetid://123456789" -- Replace with your magnifying glass image ID
-    magnifyingGlass.BackgroundTransparency = 1
-    magnifyingGlass.Parent = loadingScreen1
-
-    -- Animate the magnifying glass
-    for i = 1, 40 do
-        magnifyingGlass.Position = UDim2.new(0.5 + math.sin(i) * 0.1, -50, 0.5, -50)
-        wait(1) -- Wait for 1 second for each frame of the animation
-    end
-
-    loadingScreen1:Destroy() -- Remove loading screen after animation
-end
-
--- Function to create the second loading screen
-local function createLoadingScreen2()
-    local loadingScreen2 = Instance.new("Frame")
-    loadingScreen2.Size = UDim2.new(1, 0, 1, 0) -- Fullscreen
-    loadingScreen2.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
-    loadingScreen2.Parent = screenGui
-
-    -- Create a loading label
-    local loadingLabel2 = Instance.new("TextLabel")
-    loadingLabel2.Size = UDim2.new(1, 0, 0.1, 0)
-    loadingLabel2.Position = UDim2.new(0, 0, 0.45, 0)
-    loadingLabel2.Text = "Rejoining Server Please Do Not Close Roblox!"
-    loadingLabel2.TextColor3 = Color3.fromRGB(255, 255, 255)
-    loadingLabel2.TextScaled = true
-    loadingLabel2.BackgroundTransparency = 1
-    loadingLabel2.Parent = loadingScreen2
-
-    -- Create a loading animation
+    -- Create a loading circle
     local loadingCircle = Instance.new("Frame")
     loadingCircle.Size = UDim2.new(0.1, 0, 0.1, 0)
-    loadingCircle.Position = UDim2.new(0.5, -50, 0.5, -50)
+    loadingCircle.Position = UDim2.new(0.5, -25, 0.5, -25)
     loadingCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    loadingCircle.Parent = loadingScreen2
+    loadingCircle.Parent = loadingScreen
 
-    -- Animate the loading circle with RGB effect
+    -- Animate the loading circle
     for i = 1, 40 do
         loadingCircle.Rotation = loadingCircle.Rotation + 9 -- Rotate 9 degrees each frame
-        loadingCircle.BackgroundColor3 = Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255)) -- Random RGB color
-        wait(1) -- Wait for 1 second for each frame of the animation
+        wait(0.1) -- Wait for 0.1 seconds for each frame of the animation
     end
 
-    loadingScreen2:Destroy() -- Remove loading screen after animation
+    loadingScreen:Destroy() -- Remove loading screen after animation
 end
 
 -- Button click event
-local function onButtonClick(button)
+local function onButtonClick(button, loadingText)
     button.MouseButton1Click:Connect(function()
-        -- Smooth animation for button click
-        button:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
-            button:Destroy() -- Remove the button after animation
-        end)
-
-        -- Create the first loading screen
-        createLoadingScreen1()
-
-        -- Create the second loading screen
-        createLoadingScreen2()
+        -- Create the loading screen
+        createLoadingScreen(loadingText)
 
         -- Load the external script
         local success, err = pcall(function()
@@ -170,5 +123,5 @@ local function onButtonClick(button)
 end
 
 -- Connect button click events
-onButtonClick(button1)
-onButtonClick(button2)
+onButtonClick(button1, "Finding Low Server Please Wait.")
+onButtonClick(button2, "Rejoining Server Please Do Not Close Roblox!")
