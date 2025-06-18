@@ -110,13 +110,6 @@ local function createLoadingScreen()
     spinner.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     spinner.Parent = loadingScreen
 
-    -- Create a circular outline for the spinner
-    local outline = Instance.new("UIStroke")
-    outline.Color = Color3.fromRGB(255, 0, 0) -- Initial color (red)
-    outline.Thickness = 5
-    outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    outline.Parent = spinner
-
     -- Animate the loading spinner
     for i = 1, 60 do
         spinner.Rotation = spinner.Rotation + 6 -- Rotate 6 degrees each frame
