@@ -139,3 +139,7 @@ end
 -- Connect button click events
 onButtonClick(button1)
 onButtonClick(button2)
+
+-- Ensure the GUI is visible
+mainFrame.Visible = true
+screenGui.Enabled = true
