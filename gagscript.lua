@@ -1,145 +1,78 @@
--- LocalScript in StarterPlayerScripts or StarterGui
+-- Services
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
--- Create the ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "MyGui"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+-- Loading Screen
+local loadingScreen = Instance.new("ScreenGui", playerGui)
+loadingScreen.Name = "LoadingScreen"
+loadingScreen.ResetOnSpawn = false
 
--- Create the main GUI Frame
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0.5, 0, 0.5, 0)
-mainFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark gray background
+local loadingFrame = Instance.new("Frame", loadingScreen)
+loadingFrame.Size = UDim2.new(1, 0, 1, 0)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+local loadingText = Instance.new("TextLabel", loadingFrame)
+loadingText.Size = UDim2.new(1, 0, 1, 0)
+loadingText.Text = "Loading..."
+loadingText.Font = Enum.Font.Cartoon
+loadingText.TextSize = 48
+loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+loadingText.BackgroundTransparency = 1
+
+-- Wait a few seconds to simulate loading
+wait(3)
+
+-- Fade out loading screen
+TweenService:Create(loadingFrame, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+TweenService:Create(loadingText, TweenInfo.new(1), {TextTransparency = 1}):Play()
+wait(1.1)
+loadingScreen:Destroy()
+
+-- Main GUI
+local mainGui = Instance.new("ScreenGui", playerGui)
+mainGui.Name = "CustomGui"
+mainGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame", mainGui)
+mainFrame.Size = UDim2.new(0, 300, 0, 150)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
+mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 mainFrame.BorderSizePixel = 0
-mainFrame.Parent = screenGui
+mainFrame.BackgroundTransparency = 0.05
 
--- Add RGB glow effect to the main frame
-local mainFrameStroke = Instance.new("UIStroke")
-mainFrameStroke.Color = Color3.fromRGB(255, 0, 0) -- Initial color (red)
-mainFrameStroke.Thickness = 5
-mainFrameStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-mainFrameStroke.Parent = mainFrame
+-- UICorner for modern rounded look
+local uiCorner = Instance.new("UICorner", mainFrame)
+uiCorner.CornerRadius = UDim.new(0, 12)
 
--- Function to create RGB lighting effect
-local function createRGBLighting(frame)
-    while true do
-        for i = 0, 255, 5 do
-            frame.BackgroundColor3 = Color3.fromRGB(i, 0, 255 - i) -- RGB transition from blue to red
-            wait(0.05)
-        end
-        for i = 0, 255, 5 do
-            frame.BackgroundColor3 = Color3.fromRGB(255 - i, i, 0) -- RGB transition from red to green
-            wait(0.05)
-        end
-        for i = 0, 255, 5 do
-            frame.BackgroundColor3 = Color3.fromRGB(0, 255 - i, i) -- RGB transition from green to blue
-            wait(0.05)
-        end
-    end
+-- Layout
+local uiListLayout = Instance.new("UIListLayout", mainFrame)
+uiListLayout.Padding = UDim.new(0, 10)
+uiListLayout.FillDirection = Enum.FillDirection.Vertical
+uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
+-- Button creation function
+local function createButton(name)
+	local button = Instance.new("TextButton", mainFrame)
+	button.Size = UDim2.new(0.8, 0, 0, 40)
+	button.Text = name
+	button.Font = Enum.Font.Cartoon
+	button.TextSize = 24
+	button.TextColor3 = Color3.fromRGB(255, 255, 255)
+	button.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+	button.AutoButtonColor = true
+	local corner = Instance.new("UICorner", button)
+	corner.CornerRadius = UDim.new(0, 10)
+	return button
 end
 
--- Create the buttons
-local function createButton(text, position)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0.8, 0, 0.2, 0)
-    button.Position = position
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    button.BorderSizePixel = 0
-    button.Font = Enum.Font.SourceSans
-    button.TextSize = 30 -- Increased text size
-    button.Parent = mainFrame
+-- Create Buttons
+local adminAbuseButton = createButton("Admin Abuse")
+local dupeNowButton = createButton("Dupe Now!")
 
-    -- Add RGB glow effect to buttons
-    local buttonStroke = Instance.new("UIStroke")
-    buttonStroke.Color = Color3.fromRGB(255, 0, 0) -- Initial color (red)
-    buttonStroke.Thickness = 5
-    buttonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    buttonStroke.Parent = button
-
-    -- Apply RGB lighting effect to buttons
-    createRGBLighting(button)
-
-    -- Animation for buttons on hover
-    button.MouseEnter:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-    end)
-
-    button.MouseLeave:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    end)
-
-    return button
-end
-
-local button1 = createButton("Dupe Now!", UDim2.new(0.1, 0, 0.2, 0))
-local button2 = createButton("Admin Commands", UDim2.new(0.1, 0, 0.6, 0))
-
--- Function to create a loading screen with animation
-local function createLoadingScreen()
-    local loadingScreen = Instance.new("Frame")
-    loadingScreen.Size = UDim2.new(1, 0, 1, 0) -- Fullscreen
-    loadingScreen.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
-    loadingScreen.Parent = screenGui
-
-    -- Add RGB glow effect to loading screen
-    local loadingScreenStroke = Instance.new("UIStroke")
-    loadingScreenStroke.Color = Color3.fromRGB(255, 0, 0) -- Initial color (red)
-    loadingScreenStroke.Thickness = 5
-    loadingScreenStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    loadingScreenStroke.Parent = loadingScreen
-
-    -- Create a loading label
-    local loadingLabel = Instance.new("TextLabel")
-    loadingLabel.Size = UDim2.new(1, 0, 0.1, 0)
-    loadingLabel.Position = UDim2.new(0, 0, 0.45, 0)
-    loadingLabel.Text = "Loading, Please Wait..."
-    loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    loadingLabel.TextScaled = true
-    loadingLabel.BackgroundTransparency = 1
-    loadingLabel.Font = Enum.Font.SourceSans
-    loadingLabel.TextSize = 40 -- Increased text size
-    loadingLabel.Parent = loadingScreen
-
-    -- Create a loading spinner
-    local spinner = Instance.new("Frame")
-    spinner.Size = UDim2.new(0.1, 0, 0.1, 0)
-    spinner.Position = UDim2.new(0.5, -25, 0.5, -25)
-    spinner.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    spinner.Parent = loadingScreen
-
-    -- Animate the loading spinner
-    for i = 1, 60 do
-        spinner.Rotation = spinner.Rotation + 6 -- Rotate 6 degrees each frame
-        wait(0.1) -- Wait for 0.1 seconds for each frame of the animation
-    end
-
-    loadingScreen:Destroy() -- Remove loading screen after animation
-end
-
--- Button click event
-local function onButtonClick(button)
-    button.MouseButton1Click:Connect(function()
-        -- Create the loading screen with animation
-        createLoadingScreen()
-
-        -- Load the external script
-        local success, err = pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua"))()
-        end)
-
-        if not success then
-            warn("Failed to execute script: " .. err)
-        end
-    end)
-end
-
--- Connect button click events
-onButtonClick(button1)
-onButtonClick(button2)
-
--- Ensure the GUI is visible
-mainFrame.Visible = true
-screenGui.Enabled = true
+-- Action: Load external script
+pcall(function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua"))()
+end)
