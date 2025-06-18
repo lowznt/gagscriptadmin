@@ -1,63 +1,71 @@
-local a = Instance.new("ScreenGui")
-local b = Instance.new("Frame")
-local c = Instance.new("TextLabel")
-local d = Instance.new("TextButton")
-local e = Instance.new("TextButton")
+-- LocalScript in StarterPlayerScripts or StarterGui
 
--- Properties for the ScreenGui
-a.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+-- Create the ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MyGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Properties for the Loading Frame
-b.Size = UDim2.new(1, 0, 1, 0)
-b.Position = UDim2.new(0, 0, 0, 0)
-b.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
-b.Visible = false
-b.Parent = a
+-- Create the Loading Screen
+local loadingScreen = Instance.new("Frame")
+loadingScreen.Size = UDim2.new(1, 0, 1, 0) -- Fullscreen
+loadingScreen.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
+loadingScreen.Parent = screenGui
 
--- Properties for the Loading Text
-c.Size = UDim2.new(1, 0, 0.2, 0)
-c.Position = UDim2.new(0, 0, 0.4, 0)
-c.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black background
-c.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-c.TextScaled = true
-c.Parent = b
+-- Create a loading label
+local loadingLabel = Instance.new("TextLabel")
+loadingLabel.Size = UDim2.new(1, 0, 0.1, 0)
+loadingLabel.Position = UDim2.new(0, 0, 0.45, 0)
+loadingLabel.Text = "Loading..."
+loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+loadingLabel.TextScaled = true
+loadingLabel.BackgroundTransparency = 1
+loadingLabel.Parent = loadingScreen
 
--- Properties for the Main Frame
-local f = Instance.new("Frame")
-f.Size = UDim2.new(0.4, 0, 0.4, 0)
-f.Position = UDim2.new(0.3, 0, 0.3, 0)
-f.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark gray background
-f.Parent = a
+-- Create the main GUI Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0.5, 0, 0.5, 0)
+mainFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+mainFrame.Parent = screenGui
 
--- Properties for the Admin Button
-d.Size = UDim2.new(0.8, 0, 0.2, 0)
-d.Position = UDim2.new(0.1, 0, 0.1, 0)
-d.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Darker gray
-d.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-d.TextScaled = true
-d.Parent = f
+-- Create the button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0.8, 0, 0.2, 0)
+button.Position = UDim2.new(0.1, 0, 0.4, 0)
+button.Text = "Dupe Now, Admin Commands"
+button.TextColor3 = Color3.fromRGB(0, 0, 0)
+button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+button.Parent = mainFrame
 
--- Properties for the Dupe Button
-e.Size = UDim2.new(0.8, 0, 0.2, 0)
-e.Position = UDim2.new(0.1, 0, 0.4, 0)
-e.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Darker gray
-e.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-e.TextScaled = true
-e.Parent = f
+-- Animation for the button
+button.MouseEnter:Connect(function()
+    button.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+end)
 
--- Function to show loading screen and execute loadstring
-local function g(h)
-    b.Visible = true
-    c.Text = h
-    wait(2) -- Wait for 2 seconds to simulate loading
+button.MouseLeave:Connect(function()
+    button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+end)
+
+-- Button click event
+button.MouseButton1Click:Connect(function()
+    -- Close the GUI
+    screenGui:Destroy()
+    
+    -- Load the external script
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/main/gagscript.lua"))()
+    end)
+
+    if not success then
+        warn("Failed to execute script: " .. err)
+    end
+end)
+
+-- Animation for loading screen
+for i = 1, 10 do
+    loadingLabel.TextTransparency = i * 0.1
+    wait(0.1)
 end
 
-local function i()
-    g("Finding a Low Server Please Wait...")
-    g("Rejoining Server Please Do not Close Roblox!")
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/lowznt/growagarden/refs/heads/main/growagarden.lua"))()
-end
-
--- Button click events
-d.MouseButton1Click:Connect(i)
-e.MouseButton1Click:Connect(i)
+loadingScreen:Destroy() -- Remove loading screen after animation
